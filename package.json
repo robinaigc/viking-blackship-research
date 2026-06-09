@@ -1,5 +1,5 @@
 {
-  "name": "chronark.com",
+  "name": "viking-blackship-research",
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@10.18.2",
@@ -7,6 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "verify:content": "node scripts/verify-site-content.mjs",
     "fmt": "pnpm rome check . --apply-unsafe && pnpm rome format . --write"
   },
   "dependencies": {

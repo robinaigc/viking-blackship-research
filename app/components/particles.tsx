@@ -73,6 +73,9 @@ export default function Particles({
 		translateX: number;
 		translateY: number;
 		size: number;
+		kind: "planet" | "star";
+		surfaceOffset: number;
+		depth: number;
 		alpha: number;
 		targetAlpha: number;
 		dx: number;
@@ -98,9 +101,19 @@ export default function Particles({
 		const y = Math.floor(Math.random() * canvasSize.current.h);
 		const translateX = 0;
 		const translateY = 0;
-		const size = Math.floor(Math.random() * 2) + 0.1;
+		const isPlanet = Math.random() > 0.9;
+		const depth = isPlanet ? Math.random() * 0.65 + 0.35 : 1;
+		const size = isPlanet
+			? (Math.random() * 8 + 12) * depth
+			: Math.floor(Math.random() * 2) + 0.1;
+		const kind = isPlanet ? "planet" : "star";
+		const surfaceOffset = Math.random() * Math.PI * 2;
 		const alpha = 0;
-		const targetAlpha = parseFloat((Math.random() * 0.6 + 0.1).toFixed(1));
+		const targetAlpha = parseFloat(
+			(Math.random() * (isPlanet ? 0.24 : 0.6) + (isPlanet ? 0.08 : 0.1)).toFixed(
+				2,
+			),
+		);
 		const dx = (Math.random() - 0.5) * 0.2;
 		const dy = (Math.random() - 0.5) * 0.2;
 		const magnetism = 0.1 + Math.random() * 4;
@@ -110,6 +123,9 @@ export default function Particles({
 			translateX,
 			translateY,
 			size,
+			kind,
+			surfaceOffset,
+			depth,
 			alpha,
 			targetAlpha,
 			dx,
@@ -118,14 +134,124 @@ export default function Particles({
 		};
 	};
 
+	const drawTerrainPatch = (
+		x: number,
+		y: number,
+		size: number,
+		seed: number,
+		alpha: number,
+	) => {
+		if (!context.current) return;
+		context.current.beginPath();
+		for (let i = 0; i < 7; i++) {
+			const angle = seed + i * 0.92;
+			const radius = size * (0.18 + ((i % 3) + 1) * 0.12);
+			const px = x + Math.cos(angle) * radius;
+			const py = y + Math.sin(angle * 1.35) * radius * 0.55;
+			if (i === 0) {
+				context.current.moveTo(px, py);
+			} else {
+				context.current.quadraticCurveTo(
+					x + Math.cos(angle + 0.7) * size * 0.46,
+					y + Math.sin(angle - 0.35) * size * 0.38,
+					px,
+					py,
+				);
+			}
+		}
+		context.current.closePath();
+		context.current.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+		context.current.fill();
+	};
+
+	const drawCrater = (
+		x: number,
+		y: number,
+		radius: number,
+		alpha: number,
+	) => {
+		if (!context.current) return;
+		context.current.beginPath();
+		context.current.arc(x, y, radius, 0, 2 * Math.PI);
+		context.current.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+		context.current.lineWidth = 0.5;
+		context.current.stroke();
+		context.current.beginPath();
+		context.current.arc(x - radius * 0.25, y - radius * 0.2, radius * 0.28, 0, 2 * Math.PI);
+		context.current.fillStyle = `rgba(0, 0, 0, ${alpha * 0.6})`;
+		context.current.fill();
+	};
+
+	const drawPlanetSurface = (circle: Circle) => {
+		if (!context.current) return;
+		const { x, y, size, alpha, surfaceOffset } = circle;
+		context.current.save();
+		context.current.clip();
+		for (let i = 0; i < 4; i++) {
+			const beltY = y + Math.sin(surfaceOffset + i * 1.7) * size * 0.5;
+			context.current.beginPath();
+			context.current.ellipse(
+				x,
+				beltY,
+				size * (0.82 - i * 0.08),
+				size * (0.08 + i * 0.02),
+				surfaceOffset * 0.35 + i * 0.18,
+				0,
+				2 * Math.PI,
+			);
+			context.current.fillStyle = `rgba(255, 255, 255, ${alpha * (0.1 + i * 0.025)})`;
+			context.current.fill();
+		}
+		for (let i = 0; i < 3; i++) {
+			drawTerrainPatch(
+				x + Math.cos(surfaceOffset + i * 2.1) * size * 0.24,
+				y + Math.sin(surfaceOffset + i * 1.4) * size * 0.24,
+				size * (0.5 - i * 0.07),
+				surfaceOffset + i * 1.8,
+				alpha * (0.12 + i * 0.03),
+			);
+		}
+		for (let i = 0; i < 2; i++) {
+			drawCrater(
+				x + Math.cos(surfaceOffset + i * 2.6) * size * 0.36,
+				y + Math.sin(surfaceOffset + i * 1.9) * size * 0.3,
+				size * (0.08 + i * 0.035),
+				alpha * 0.16,
+			);
+		}
+		context.current.restore();
+	};
+
 	const drawCircle = (circle: Circle, update = false) => {
 		if (context.current) {
-			const { x, y, translateX, translateY, size, alpha } = circle;
+			const { x, y, translateX, translateY, size, alpha, kind, surfaceOffset } =
+				circle;
 			context.current.translate(translateX, translateY);
 			context.current.beginPath();
 			context.current.arc(x, y, size, 0, 2 * Math.PI);
-			context.current.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+			if (kind === "planet") {
+				context.current.globalAlpha = alpha * circle.depth;
+				const gradient = context.current.createRadialGradient(
+					x - size * 0.42,
+					y - size * 0.42,
+					size * 0.1,
+					x,
+					y,
+					size,
+				);
+				gradient.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+				gradient.addColorStop(0.34, "rgba(190, 190, 190, 0.7)");
+				gradient.addColorStop(0.68, "rgba(82, 82, 82, 0.48)");
+				gradient.addColorStop(1, "rgba(14, 14, 14, 0.75)");
+				context.current.fillStyle = gradient;
+			} else {
+				context.current.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+			}
 			context.current.fill();
+			if (kind === "planet") {
+				drawPlanetSurface(circle);
+				context.current.globalAlpha = 1;
+			}
 			context.current.setTransform(dpr, 0, 0, dpr, 0, 0);
 
 			if (!update) {

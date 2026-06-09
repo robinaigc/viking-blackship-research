@@ -3,22 +3,25 @@ import { Inter } from "@next/font/google";
 import LocalFont from "@next/font/local";
 import { Metadata } from "next";
 import { Analytics } from "./components/analytics";
+import { LanguageProvider } from "./components/language";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://vikingblackship.com"),
   title: {
-    default: "chronark.com",
-    template: "%s | chronark.com",
+    default: "Robin Seun | Viking Blackship",
+    template: "%s | Robin Seun",
   },
-  description: "Co-founder of unkey.com",
+  description:
+    "Sharp, evidence-based analysis on China's economy, policy signals, and local government behavior.",
   openGraph: {
-    title: "chronark.com",
+    title: "Robin Seun | Viking Blackship",
     description:
-      "Co-founder of unkey.com",
-    url: "https://chronark.com",
-    siteName: "chronark.com",
+      "Sharp, evidence-based analysis on China's economy, policy signals, and local government behavior.",
+    url: "https://vikingblackship.com",
+    siteName: "Viking Blackship",
     images: [
       {
-        url: "https://chronark.com/og.png",
+        url: "/viking-blackship-logo.png",
         width: 1920,
         height: 1080,
       },
@@ -38,7 +41,7 @@ export const metadata: Metadata = {
     },
   },
   twitter: {
-    title: "Chronark",
+    title: "Robin Seun",
     card: "summary_large_image",
   },
   icons: {
@@ -69,7 +72,7 @@ export default function RootLayout({
         className={`bg-black ${process.env.NODE_ENV === "development" ? "debug-screens" : undefined
           }`}
       >
-        {children}
+        <LanguageProvider>{children}</LanguageProvider>
       </body>
     </html>
   );
