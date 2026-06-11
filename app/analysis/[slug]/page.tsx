@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Card } from "../../components/card";
 import {
@@ -15,17 +16,18 @@ import {
 } from "../../data/analysis";
 
 type Props = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
 export function generateStaticParams() {
   return analysisArticles.map((article) => ({ slug: article.slug }));
 }
 
-export function generateMetadata({ params }: Props) {
-  const article = getArticleBySlug(params.slug);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const article = getArticleBySlug(slug);
   if (!article) {
     return {};
   }
@@ -33,20 +35,54 @@ export function generateMetadata({ params }: Props) {
   return {
     title: article.title,
     description: article.summary,
+    alternates: { canonical: `/analysis/${article.slug}` },
+    openGraph: {
+      type: "article",
+      title: article.title,
+      description: article.summary,
+      url: `/analysis/${article.slug}`,
+      publishedTime: article.publishedAt,
+      authors: [article.author],
+      images: [{ url: "/og.png", width: 1362, height: 482 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description: article.summary,
+      images: ["/og.png"],
+    },
   };
 }
 
-export default function ArticleDetailPage({ params }: Props) {
-  const article = getArticleBySlug(params.slug);
+export default async function ArticleDetailPage({ params }: Props) {
+  const { slug } = await params;
+  const article = getArticleBySlug(slug);
 
   if (!article) {
     notFound();
   }
 
   const related = getRelatedArticles(article);
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: article.title,
+    description: article.summary,
+    datePublished: article.publishedAt,
+    author: { "@type": "Person", name: article.author },
+    publisher: { "@type": "Organization", name: "Viking Blackship" },
+    mainEntityOfPage: `https://vikingblackship.com/analysis/${article.slug}`,
+    image: "https://vikingblackship.com/og.png",
+  };
 
   return (
     <main className="min-h-screen bg-zinc-950">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
+        }}
+      />
       <Navigation />
       <header className="relative isolate overflow-hidden bg-gradient-to-tl from-black via-zinc-900 to-black px-6 pb-16 pt-32 text-center">
         <div className="mx-auto max-w-4xl">

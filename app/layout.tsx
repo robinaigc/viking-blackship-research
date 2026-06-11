@@ -1,6 +1,6 @@
 import "../global.css";
-import { Inter } from "@next/font/google";
-import LocalFont from "@next/font/local";
+import { Inter } from "next/font/google";
+import LocalFont from "next/font/local";
 import { Metadata } from "next";
 import { Analytics } from "./components/analytics";
 import { LanguageProvider } from "./components/language";
@@ -13,6 +13,10 @@ export const metadata: Metadata = {
   },
   description:
     "Sharp, evidence-based analysis on China's economy, policy signals, and local government behavior.",
+  alternates: {
+    canonical: "/",
+  },
+  manifest: "/manifest.webmanifest",
   openGraph: {
     title: "Robin Seun | Viking Blackship",
     description:
@@ -21,9 +25,10 @@ export const metadata: Metadata = {
     siteName: "Viking Blackship",
     images: [
       {
-        url: "/viking-blackship-logo.png",
-        width: 1920,
-        height: 1080,
+        url: "/og.png",
+        width: 1362,
+        height: 482,
+        alt: "Viking Blackship research and consulting",
       },
     ],
     locale: "en-US",
@@ -41,8 +46,11 @@ export const metadata: Metadata = {
     },
   },
   twitter: {
-    title: "Robin Seun",
+    title: "Robin Seun | Viking Blackship",
+    description:
+      "Sharp, evidence-based analysis on China's economy, policy signals, and local government behavior.",
     card: "summary_large_image",
+    images: ["/og.png"],
   },
   icons: {
     shortcut: "/favicon.png",
@@ -64,8 +72,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={[inter.variable, calSans.variable].join(" ")}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={[inter.variable, calSans.variable].join(" ")}
+    >
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var l=localStorage.getItem('viking-blackship-language');if(l==='zh'||l==='en'){document.documentElement.dataset.language=l;document.documentElement.lang=l==='zh'?'zh-CN':'en'}}catch(e){}",
+          }}
+        />
         <Analytics />
       </head>
       <body

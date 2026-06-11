@@ -6,5 +6,40 @@
   .text-edge-outline {
     -webkit-text-stroke: 1px rgba(255,255,255,0.3);
   }
-} 
+}
+
+html:not([data-language="zh"]) [data-localized="true"] [data-language-copy="zh"],
+html[data-language="zh"] [data-localized="true"] [data-language-copy="en"] {
+  visibility: hidden;
+}
+
+html:not([data-language="zh"])
+  [data-localized="true"][data-reserve-space="false"]
+  [data-language-copy="zh"],
+html[data-language="zh"]
+  [data-localized="true"][data-reserve-space="false"]
+  [data-language-copy="en"] {
+  display: none;
+}
+
+html:not([data-language="zh"])
+  [data-localized="true"][data-reserve-space="false"]
+  [data-language-copy="en"],
+html[data-language="zh"]
+  [data-localized="true"][data-reserve-space="false"]
+  [data-language-copy="zh"] {
+  display: contents;
+  visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 

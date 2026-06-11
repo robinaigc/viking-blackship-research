@@ -19,25 +19,39 @@ function BilingualSlot({
   en,
   zh,
   className,
+  reserveSpace = true,
 }: {
   layout: BilingualLayout;
   showEn: boolean;
   en: React.ReactNode;
   zh: React.ReactNode;
   className?: string;
+  reserveSpace?: boolean;
 }) {
-  const gridClass = layout === "block" ? "grid w-full" : "inline-grid";
+  const layoutClass = reserveSpace
+    ? layout === "block"
+      ? "grid w-full"
+      : "inline-grid"
+    : layout === "block"
+      ? "block w-full"
+      : "inline";
 
   return (
-    <span className={[gridClass, className].filter(Boolean).join(" ")}>
+    <span
+      data-localized="true"
+      data-reserve-space={reserveSpace ? "true" : "false"}
+      className={[layoutClass, className].filter(Boolean).join(" ")}
+    >
       <span
-        className={`col-start-1 row-start-1 ${showEn ? "visible" : "invisible"}`}
+        data-language-copy="en"
+        className={reserveSpace ? "col-start-1 row-start-1" : undefined}
         aria-hidden={!showEn}
       >
         {en}
       </span>
       <span
-        className={`col-start-1 row-start-1 ${showEn ? "invisible" : "visible"}`}
+        data-language-copy="zh"
+        className={reserveSpace ? "col-start-1 row-start-1" : undefined}
         aria-hidden={showEn}
       >
         {zh}
@@ -50,16 +64,16 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguage] = useState<Language>("en");
 
   useEffect(() => {
-    const stored = window.localStorage.getItem("viking-blackship-language");
-    if (stored === "en" || stored === "zh") {
-      setLanguage(stored);
-      document.documentElement.lang = stored === "zh" ? "zh-CN" : "en";
-      document.documentElement.dataset.language = stored;
-    }
+    try {
+      const stored = window.localStorage.getItem("viking-blackship-language");
+      if (stored === "en" || stored === "zh") setLanguage(stored);
+    } catch {}
   }, []);
 
   useEffect(() => {
-    window.localStorage.setItem("viking-blackship-language", language);
+    try {
+      window.localStorage.setItem("viking-blackship-language", language);
+    } catch {}
     document.documentElement.lang = language === "zh" ? "zh-CN" : "en";
     document.documentElement.dataset.language = language;
   }, [language]);
@@ -81,35 +95,21 @@ export function useLanguage() {
 
 export function LanguageToggle({ className }: { className: string }) {
   const { language, toggleLanguage } = useLanguage();
-  const showEn = language === "en";
 
   return (
-    <span
-      role="button"
-      tabIndex={0}
+    <button
+      type="button"
       onClick={toggleLanguage}
-      onKeyDown={(event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          toggleLanguage();
-        }
-      }}
-      aria-label={language === "zh" ? "切换语言" : "Toggle language"}
-      className={`inline-grid cursor-pointer ${className}`}
+      aria-label={language === "zh" ? "切换到英文" : "Switch to Chinese"}
+      className={`inline-grid bg-transparent ${className}`}
     >
-      <span
-        className={`col-start-1 row-start-1 ${showEn ? "visible" : "invisible"}`}
-        aria-hidden={!showEn}
-      >
-        En/中文
-      </span>
-      <span
-        className={`col-start-1 row-start-1 ${showEn ? "invisible" : "visible"}`}
-        aria-hidden={showEn}
-      >
-        中文/En
-      </span>
-    </span>
+      <BilingualSlot
+        layout="inline"
+        showEn={language === "en"}
+        en="En/中文"
+        zh="中文/En"
+      />
+    </button>
   );
 }
 
@@ -126,12 +126,14 @@ export function LocalizedText({
 }) {
   const { language } = useLanguage();
 
-  if (!reserveSpace) {
-    return <>{language === "zh" ? zh : en}</>;
-  }
-
   return (
-    <BilingualSlot layout={layout} showEn={language === "en"} en={en} zh={zh} />
+    <BilingualSlot
+      layout={layout}
+      showEn={language === "en"}
+      en={en}
+      zh={zh}
+      reserveSpace={reserveSpace}
+    />
   );
 }
 
