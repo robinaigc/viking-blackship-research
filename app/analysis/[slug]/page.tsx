@@ -12,6 +12,7 @@ import {
   getRelatedPublicArticles,
 } from "../../lib/articles/repository";
 import { estimateReadingTime } from "../../lib/articles/selectors";
+import { getSiteUrl } from "../../lib/site-url.mjs";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -51,6 +52,7 @@ export default async function ArticleDetailPage({ params }: Props) {
   const related = await getRelatedPublicArticles(article);
   const localized = article.localized;
   const publishedAt = article.publishedAt ?? article.createdAt;
+  const siteUrl = getSiteUrl();
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -60,8 +62,8 @@ export default async function ArticleDetailPage({ params }: Props) {
     dateModified: article.updatedAt,
     author: { "@type": "Person", name: article.author },
     publisher: { "@type": "Organization", name: "Viking Blackship" },
-    mainEntityOfPage: `https://vikingblackship.com/analysis/${article.slug}`,
-    image: article.coverImageUrl ?? "https://vikingblackship.com/og.png",
+    mainEntityOfPage: `${siteUrl}/analysis/${article.slug}`,
+    image: article.coverImageUrl ?? `${siteUrl}/og.png`,
   };
 
   return (

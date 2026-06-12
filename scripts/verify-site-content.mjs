@@ -78,6 +78,19 @@ const layout = read("app/layout.tsx");
 assert.match(layout, /alternates/);
 assert.match(layout, /\/og\.png/);
 
+for (const seoFile of [
+  "app/layout.tsx",
+  "app/sitemap.ts",
+  "app/robots.ts",
+  "app/analysis/[slug]/page.tsx",
+]) {
+  assert.doesNotMatch(
+    read(seoFile),
+    /https:\/\/vikingblackship\.com/,
+    `${seoFile} should use the configured public site URL`,
+  );
+}
+
 const language = read("app/components/language.tsx");
 assert.match(language, /<button/);
 assert.doesNotMatch(language, /role="button"/);
