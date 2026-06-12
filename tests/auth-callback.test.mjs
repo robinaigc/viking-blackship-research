@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import test from "node:test";
 import { getAuthCallbackCredentials } from "../app/lib/auth/callback.mjs";
 
@@ -33,5 +34,16 @@ test("rejects incomplete callback URLs", () => {
   assert.deepEqual(
     getAuthCallbackCredentials("https://example.com/admin/auth/callback"),
     { kind: "missing" },
+  );
+});
+
+test("captures callback credentials before creating the Supabase browser client", () => {
+  const callbackPage = fs.readFileSync(
+    new URL("../app/admin/auth/callback/page.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.ok(
+    callbackPage.indexOf("getAuthCallbackCredentials(window.location.href)") <
+      callbackPage.indexOf("createSupabaseBrowserClient()"),
   );
 });

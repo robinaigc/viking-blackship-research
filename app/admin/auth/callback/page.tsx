@@ -9,13 +9,15 @@ export default function AdminAuthCallbackPage() {
     let active = true;
 
     async function completeLogin() {
+      // Capture the fragment before Supabase's browser client auto-detects and
+      // removes an implicit-flow session from the URL.
+      const credentials = getAuthCallbackCredentials(window.location.href);
       const supabase = createSupabaseBrowserClient();
       if (!supabase) {
         window.location.replace("/admin/login?error=not-configured");
         return;
       }
 
-      const credentials = getAuthCallbackCredentials(window.location.href);
       let error = null;
 
       if (credentials.kind === "code") {
@@ -31,8 +33,11 @@ export default function AdminAuthCallbackPage() {
           refresh_token: credentials.refreshToken,
         }));
       } else {
-        window.location.replace("/admin/login?error=missing-code");
-        return;
+        const { data } = await supabase.auth.getSession();
+        if (!data.session) {
+          window.location.replace("/admin/login?error=missing-code");
+          return;
+        }
       }
 
       if (!active) return;
