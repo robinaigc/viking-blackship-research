@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { getMagicLinkErrorKey } from "../lib/auth/errors.mjs";
 import { getAdminEmail, getSupabaseConfig } from "../lib/supabase/config";
 import { createSupabaseServerClient } from "../lib/supabase/server";
 
@@ -26,7 +27,16 @@ export async function requestMagicLink(formData: FormData) {
       shouldCreateUser: true,
     },
   });
-  if (error) redirect("/admin/login?error=login-failed");
+  if (error) {
+    const errorKey = getMagicLinkErrorKey(error);
+    if (errorKey !== "rate-limited") {
+      console.error("Supabase magic-link request failed", {
+        code: error.code,
+        status: error.status,
+      });
+    }
+    redirect(`/admin/login?error=${errorKey}`);
+  }
   redirect("/admin/login?sent=1");
 }
 
