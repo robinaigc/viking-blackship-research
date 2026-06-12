@@ -46,6 +46,26 @@ existing static articles. The private publishing dashboard is available at
 Published articles appear automatically on `/analysis`; the three newest
 featured articles also appear on the home page. Drafts remain private.
 
+## Custom Domain Activation
+
+The site can remain live on
+`https://viking-blackship-research.vercel.app` until a custom domain is
+registered. After purchasing the domain:
+
+1. Add the domain to the Vercel project and create the DNS record Vercel
+   requests. For `vikingblackship.com`, the current recommended record is
+   `A @ 76.76.21.21`.
+2. Set `NEXT_PUBLIC_APP_URL` in Vercel Production, Preview, and Development
+   to the final `https://` domain, without a trailing slash.
+3. Set the Supabase Auth Site URL to the same domain and add
+   `https://YOUR_DOMAIN/admin/auth/callback` to the redirect allow list.
+4. Redeploy the Vercel production deployment, then verify `/`,
+   `/admin/login`, `/sitemap.xml`, and `/robots.txt`.
+
+Canonical metadata, Open Graph URLs, structured article data, sitemap entries,
+and robots directives all derive from `NEXT_PUBLIC_APP_URL`, so no source
+code changes are needed when the custom domain goes live.
+
 ## Verification
 
 ```powershell
