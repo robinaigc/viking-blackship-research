@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 import { getPublicArticles } from "./lib/articles/repository";
+import { getSiteUrl } from "./lib/site-url.mjs";
 
-const baseUrl = "https://vikingblackship.com";
+const baseUrl = getSiteUrl();
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = ["", "/analysis", "/products", "/about", "/subscribe"];

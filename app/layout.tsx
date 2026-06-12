@@ -4,9 +4,12 @@ import LocalFont from "next/font/local";
 import { Metadata } from "next";
 import { Analytics } from "./components/analytics";
 import { LanguageProvider } from "./components/language";
+import { getSiteUrl } from "./lib/site-url.mjs";
+
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://vikingblackship.com"),
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Robin Seun | Viking Blackship",
     template: "%s | Robin Seun",
@@ -21,7 +24,7 @@ export const metadata: Metadata = {
     title: "Robin Seun | Viking Blackship",
     description:
       "Sharp, evidence-based analysis on China's economy, policy signals, and local government behavior.",
-    url: "https://vikingblackship.com",
+    url: siteUrl,
     siteName: "Viking Blackship",
     images: [
       {
