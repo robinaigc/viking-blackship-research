@@ -43,3 +43,24 @@ html[data-language="zh"]
   }
 }
 
+.article-content {
+  color: rgb(161 161 170);
+  font-size: 1rem;
+  line-height: 2;
+}
+
+.article-content > * + * { margin-top: 1.5rem; }
+.article-content h2 { margin-top: 2.5rem; font-family: var(--font-calsans); font-size: 1.75rem; color: rgb(244 244 245); }
+.article-content h3 { margin-top: 2rem; font-size: 1.35rem; font-weight: 600; color: rgb(228 228 231); }
+.article-content ul { list-style: disc; padding-left: 1.5rem; }
+.article-content ol { list-style: decimal; padding-left: 1.5rem; }
+.article-content li + li { margin-top: 0.6rem; }
+.article-content blockquote { border-left: 2px solid rgb(82 82 91); padding-left: 1.25rem; color: rgb(212 212 216); }
+.article-content a { color: white; text-decoration: underline; text-underline-offset: 4px; }
+.article-content code { border-radius: 0.25rem; background: rgb(39 39 42); padding: 0.15rem 0.35rem; color: rgb(244 244 245); }
+.article-content img { max-height: 720px; width: 100%; border-radius: 0.75rem; object-fit: contain; }
+.article-content .table-scroll { overflow-x: auto; }
+.article-content table { width: 100%; border-collapse: collapse; }
+.article-content th, .article-content td { min-width: 8rem; border: 1px solid rgb(63 63 70); padding: 0.7rem; text-align: left; }
+.article-content th { background: rgb(24 24 27); color: rgb(244 244 245); }
+

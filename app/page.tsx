@@ -7,7 +7,7 @@ import Particles from "./components/particles";
 import { SubscribeForm } from "./components/subscribe-form";
 import { LanguageToggle, LocalizedText } from "./components/language";
 import { credentials } from "./data/credentials";
-import { getFeaturedArticles } from "./data/analysis";
+import { getFeaturedPublicArticles } from "./lib/articles/repository";
 import { products } from "./data/products";
 
 const heroNavItemClassName =
@@ -20,8 +20,8 @@ const navigation = [
   { label: "Subscribe", zh: "订阅", href: "/subscribe" },
 ];
 
-export default function Home() {
-  const featured = getFeaturedArticles();
+export default async function Home() {
+  const featured = await getFeaturedPublicArticles();
 
   return (
     <main className="min-h-screen overflow-hidden bg-gradient-to-tl from-black via-zinc-600/20 to-black">

@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
-import { getPublishedArticles } from "./data/analysis";
+import { getPublicArticles } from "./lib/articles/repository";
 
 const baseUrl = "https://vikingblackship.com";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = ["", "/analysis", "/products", "/about", "/subscribe"];
 
   return [
@@ -13,12 +13,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: path === "" ? ("weekly" as const) : ("monthly" as const),
       priority: path === "" ? 1 : 0.8,
     })),
-    ...getPublishedArticles().map((article) => ({
+    ...(await getPublicArticles()).map((article) => ({
       url: `${baseUrl}/analysis/${article.slug}`,
-      lastModified: new Date(article.publishedAt),
+      lastModified: new Date(article.publishedAt ?? article.createdAt),
       changeFrequency: "monthly" as const,
       priority: 0.7,
     })),
   ];
 }
-
