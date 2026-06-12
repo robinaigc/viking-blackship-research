@@ -16,8 +16,8 @@ export async function requestMagicLink(formData: FormData) {
   if (!supabase) redirect("/admin/login?error=not-configured");
   const requestHeaders = await headers();
   const origin =
-    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
     requestHeaders.get("origin") ??
+    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
     "http://localhost:3000";
   const { error } = await supabase.auth.signInWithOtp({
     email,
