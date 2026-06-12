@@ -2,7 +2,8 @@ import { AnalysisCard } from "../components/analysis-card";
 import { Card } from "../components/card";
 import { LocalizedText } from "../components/language";
 import { Navigation } from "../components/nav";
-import { categories, getPublishedArticles } from "../data/analysis";
+import { categories } from "../data/analysis";
+import { getPublicArticles } from "../lib/articles/repository";
 
 export const metadata = {
   title: "Analysis",
@@ -10,8 +11,8 @@ export const metadata = {
     "English commentary on China's economy, policy signals, local government behavior, and supply chains.",
 };
 
-export default function AnalysisPage() {
-  const articles = getPublishedArticles();
+export default async function AnalysisPage() {
+  const articles = await getPublicArticles();
 
   return (
     <main className="min-h-screen bg-gradient-to-tl from-zinc-900/0 via-zinc-900 to-zinc-900/0">

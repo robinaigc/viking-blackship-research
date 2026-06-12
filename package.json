@@ -9,9 +9,17 @@
     "start": "next start",
     "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/*.test.mjs",
     "verify:content": "node scripts/verify-site-content.mjs",
+    "migrate:articles": "node --env-file=.env.local --experimental-strip-types scripts/migrate-static-articles.mjs",
     "fmt": "pnpm rome check . --apply-unsafe && pnpm rome format . --write"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.108.1",
+    "@tiptap/extension-image": "^3.26.0",
+    "@tiptap/extension-link": "^3.26.0",
+    "@tiptap/extension-table": "^3.26.0",
+    "@tiptap/react": "^3.26.0",
+    "@tiptap/starter-kit": "^3.26.0",
     "@upstash/redis": "1.36.4",
     "framer-motion": "10.18.0",
     "lucide-react": "0.284.0",

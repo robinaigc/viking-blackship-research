@@ -124,7 +124,6 @@ const allApp = fs
 for (const forbidden of [
   "会员",
   "在线支付",
-  "login",
   "member center",
   "Canada local",
   "small business",
