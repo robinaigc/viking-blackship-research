@@ -13,6 +13,7 @@ const errorMessages: Record<string, string> = {
   "rate-limited": "A sign-in email was requested recently. Wait about one minute, then try again.",
   "login-failed": "The login email could not be sent. Please try again.",
   "missing-code": "The login link is incomplete.",
+  "invalid-link": "The login link is invalid or has expired. Request a new email and try again.",
   "registration-failed": "The administrator account could not be registered.",
 };
 
