@@ -9,7 +9,7 @@
     "start": "next start",
     "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/*.test.mjs",
     "verify:content": "node scripts/verify-site-content.mjs",
-    "migrate:articles": "node --experimental-strip-types scripts/migrate-static-articles.mjs",
+    "migrate:articles": "node --env-file=.env.local --experimental-strip-types scripts/migrate-static-articles.mjs",
     "fmt": "pnpm rome check . --apply-unsafe && pnpm rome format . --write"
   },
   "dependencies": {

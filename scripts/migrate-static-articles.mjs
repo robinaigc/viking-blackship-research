@@ -54,6 +54,14 @@ function blocksToDocument(blocks) {
 }
 
 async function findAdminUser(email) {
+  const { data: membership, error: membershipError } = await supabase
+    .from("site_admins")
+    .select("user_id")
+    .limit(1)
+    .maybeSingle();
+  if (membershipError) throw membershipError;
+  if (membership?.user_id) return { id: membership.user_id, email };
+
   for (let page = 1; ; page += 1) {
     const { data, error } = await supabase.auth.admin.listUsers({ page, perPage: 100 });
     if (error) throw error;
