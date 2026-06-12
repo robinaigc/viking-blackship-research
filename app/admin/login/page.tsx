@@ -10,6 +10,7 @@ type Props = { searchParams: Promise<{ sent?: string; error?: string }> };
 const errorMessages: Record<string, string> = {
   "not-configured": "Supabase or ADMIN_EMAIL is not configured yet.",
   "not-authorized": "This email is not authorized to manage the site.",
+  "rate-limited": "A sign-in email was requested recently. Wait about one minute, then try again.",
   "login-failed": "The login email could not be sent. Please try again.",
   "missing-code": "The login link is incomplete.",
   "registration-failed": "The administrator account could not be registered.",
