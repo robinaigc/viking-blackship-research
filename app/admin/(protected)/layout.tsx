@@ -18,10 +18,10 @@ export default async function AdminLayout({
 						href="/admin/articles/new"
 						className="text-sm text-zinc-400 hover:text-white"
 					>
-						<LocalizedText en="New article" zh="新建文章" />
+						<LocalizedText en="New article" zh={"\u65b0\u5efa\u6587\u7ae0"} />
 					</Link>
 					<Link href="/" className="text-sm text-zinc-400 hover:text-white">
-						<LocalizedText en="View website" zh="查看网站" />
+						<LocalizedText en="View website" zh={"\u67e5\u770b\u7f51\u7ad9"} />
 					</Link>
 					<LanguageToggle className="ml-auto text-sm text-zinc-400 duration-200 hover:text-white" />
 					<span className="hidden text-xs text-zinc-600 sm:block">
@@ -32,7 +32,7 @@ export default async function AdminLayout({
 							type="submit"
 							className="text-sm text-zinc-400 hover:text-white"
 						>
-							<LocalizedText en="Sign out" zh="退出登录" />
+							<LocalizedText en="Sign out" zh={"\u9000\u51fa\u767b\u5f55"} />
 						</button>
 					</form>
 				</div>
