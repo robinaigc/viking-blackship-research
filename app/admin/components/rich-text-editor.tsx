@@ -101,7 +101,7 @@ function ResizableImageView({
 		<NodeViewWrapper
 			as="figure"
 			ref={wrapperRef}
-			className={`relative mx-auto my-6 max-w-full ${
+			className={`relative mr-auto my-6 max-w-full ${
 				selected ? "ring-2 ring-sky-400" : ""
 			}`}
 			contentEditable={false}

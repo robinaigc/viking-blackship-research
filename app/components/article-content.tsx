@@ -67,7 +67,7 @@ function renderNode(
 		const rawWidth = String(node.attrs?.width ?? "100%");
 		const imageWidth = /^(50|70|100)%$/.test(rawWidth) ? rawWidth : "100%";
 		return (
-			<figure key={key} style={{ width: imageWidth }}>
+			<figure key={key} style={{ width: imageWidth, marginRight: "auto" }}>
 				<img
 					src={src}
 					alt={String(node.attrs?.alt ?? "Article image")}

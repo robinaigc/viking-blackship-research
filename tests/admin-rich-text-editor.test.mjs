@@ -45,5 +45,11 @@ test("rich text editor defaults pasted images smaller and supports drag resizing
 		richTextEditor,
 		/updateAttributes\(\{ width: `\$\{nextWidth\}%` \}\)/,
 	);
-	assert.match(articleContent, /style=\{\{ width: imageWidth \}\}/);
+	assert.doesNotMatch(richTextEditor, /mx-auto/);
+	assert.match(richTextEditor, /mr-auto/);
+	assert.match(
+		articleContent,
+		/style=\{\{ width: imageWidth, marginRight: "auto" \}\}/,
+	);
+	assert.match(articleContent, /marginRight: "auto"/);
 });
