@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { ArticleDocument, ArticleRecord } from "../../lib/articles/types";
 import { slugifyArticleTitle } from "../../lib/articles/validation";
+import { CoverImageUploader } from "./cover-image-uploader";
 import { RichTextEditor } from "./rich-text-editor";
 
 type Props = {
@@ -134,13 +135,8 @@ export function ArticleForm({
 					/>
 				</label>
 				<label className="text-sm text-zinc-300">
-					Cover image URL
-					<input
-						className={fieldClass}
-						name="coverImageUrl"
-						type="url"
-						defaultValue={article?.coverImageUrl ?? ""}
-					/>
+					Cover image
+					<CoverImageUploader initialUrl={article?.coverImageUrl} />
 				</label>
 			</div>
 
