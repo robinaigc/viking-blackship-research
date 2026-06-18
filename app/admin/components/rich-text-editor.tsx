@@ -3,9 +3,19 @@
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import { TableKit } from "@tiptap/extension-table";
-import { EditorContent, useEditor } from "@tiptap/react";
+import {
+	EditorContent,
+	NodeViewWrapper,
+	ReactNodeViewRenderer,
+	useEditor,
+	type NodeViewProps,
+} from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { useRef, useState } from "react";
+import {
+	useRef,
+	useState,
+	type PointerEvent as ReactPointerEvent,
+} from "react";
 import type { ArticleDocument } from "../../lib/articles/types";
 
 type Props = {
@@ -16,6 +26,120 @@ type Props = {
 const buttonClass =
 	"rounded border border-zinc-700 px-2.5 py-1.5 text-xs text-zinc-300 hover:border-zinc-400 hover:text-white disabled:opacity-40";
 const DEFAULT_IMAGE_WIDTH = "70%";
+const resizeHandles = ["nw", "n", "ne", "e", "se", "s", "sw", "w"] as const;
+type ResizeHandle = typeof resizeHandles[number];
+
+function clampImageWidth(value: number) {
+	return Math.max(25, Math.min(100, Math.round(value)));
+}
+
+function getImageWidth(value: unknown) {
+	return typeof value === "string" && /^(?:[2-9]\d|100)%$/.test(value)
+		? value
+		: DEFAULT_IMAGE_WIDTH;
+}
+
+function ResizableImageView({
+	node,
+	selected,
+	updateAttributes,
+}: NodeViewProps) {
+	const wrapperRef = useRef<HTMLDivElement>(null);
+	const width = getImageWidth(node.attrs.width);
+
+	function startResize(
+		event: ReactPointerEvent<HTMLButtonElement>,
+		handle: ResizeHandle,
+	) {
+		event.preventDefault();
+		event.stopPropagation();
+
+		const wrapper = wrapperRef.current;
+		const parent = wrapper?.parentElement;
+		if (!wrapper || !parent) return;
+
+		const startX = event.clientX;
+		const startY = event.clientY;
+		const rect = wrapper.getBoundingClientRect();
+		const parentWidth = parent.getBoundingClientRect().width || rect.width;
+		const aspectRatio = rect.width / (rect.height || rect.width || 1);
+
+		function horizontalDelta(pointerEvent: PointerEvent) {
+			if (handle.includes("e")) return pointerEvent.clientX - startX;
+			if (handle.includes("w")) return startX - pointerEvent.clientX;
+			return 0;
+		}
+
+		function verticalDelta(pointerEvent: PointerEvent) {
+			if (handle.includes("s"))
+				return (pointerEvent.clientY - startY) * aspectRatio;
+			if (handle.includes("n"))
+				return (startY - pointerEvent.clientY) * aspectRatio;
+			return 0;
+		}
+
+		function onPointerMove(pointerEvent: PointerEvent) {
+			const xDelta = horizontalDelta(pointerEvent);
+			const yDelta = verticalDelta(pointerEvent);
+			const delta = Math.abs(xDelta) >= Math.abs(yDelta) ? xDelta : yDelta;
+			const nextWidth = clampImageWidth(
+				((rect.width + delta) / parentWidth) * 100,
+			);
+			updateAttributes({ width: `${nextWidth}%` });
+		}
+
+		function onPointerUp() {
+			window.removeEventListener("pointermove", onPointerMove);
+			window.removeEventListener("pointerup", onPointerUp);
+		}
+
+		window.addEventListener("pointermove", onPointerMove);
+		window.addEventListener("pointerup", onPointerUp);
+	}
+
+	return (
+		<NodeViewWrapper
+			as="figure"
+			ref={wrapperRef}
+			className={`relative mx-auto my-6 max-w-full ${
+				selected ? "ring-2 ring-sky-400" : ""
+			}`}
+			contentEditable={false}
+			style={{ width }}
+		>
+			<img
+				src={node.attrs.src}
+				alt={String(node.attrs.alt ?? "Article image")}
+				className="block h-auto w-full"
+				draggable={false}
+			/>
+			{selected
+				? resizeHandles.map((handle) => (
+						<button
+							key={handle}
+							type="button"
+							data-image-resize-handle={handle}
+							aria-label={`Resize image ${handle}`}
+							className={`absolute h-3 w-3 rounded-full border border-sky-200 bg-sky-500 ${
+								handle.includes("n")
+									? "-top-1.5"
+									: handle.includes("s")
+									? "-bottom-1.5"
+									: "top-1/2 -translate-y-1/2"
+							} ${
+								handle.includes("w")
+									? "-left-1.5"
+									: handle.includes("e")
+									? "-right-1.5"
+									: "left-1/2 -translate-x-1/2"
+							}`}
+							onPointerDown={(event) => startResize(event, handle)}
+						/>
+				  ))
+				: null}
+		</NodeViewWrapper>
+	);
+}
 
 const ResizableImage = Image.extend({
 	addAttributes() {
@@ -31,6 +155,9 @@ const ResizableImage = Image.extend({
 				}),
 			},
 		};
+	},
+	addNodeView() {
+		return ReactNodeViewRenderer(ResizableImageView);
 	},
 });
 
@@ -111,10 +238,6 @@ export function RichTextEditor({ initialContent, onChange }: Props) {
 			setUploading(false);
 			if (fileInput.current) fileInput.current.value = "";
 		}
-	}
-
-	function setImageWidth(width: "50%" | "70%" | "100%") {
-		editor?.chain().focus().updateAttributes("image", { width }).run();
 	}
 
 	if (!editor)
@@ -210,27 +333,6 @@ export function RichTextEditor({ initialContent, onChange }: Props) {
 					onClick={() => fileInput.current?.click()}
 				>
 					{uploading ? "Uploading..." : "Image"}
-				</button>
-				<button
-					type="button"
-					className={buttonClass}
-					onClick={() => setImageWidth("50%")}
-				>
-					Image 50%
-				</button>
-				<button
-					type="button"
-					className={buttonClass}
-					onClick={() => setImageWidth("70%")}
-				>
-					Image 70%
-				</button>
-				<button
-					type="button"
-					className={buttonClass}
-					onClick={() => setImageWidth("100%")}
-				>
-					Image 100%
 				</button>
 				<button
 					type="button"
