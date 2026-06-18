@@ -15,6 +15,24 @@ type Props = {
 
 const buttonClass =
 	"rounded border border-zinc-700 px-2.5 py-1.5 text-xs text-zinc-300 hover:border-zinc-400 hover:text-white disabled:opacity-40";
+const DEFAULT_IMAGE_WIDTH = "70%";
+
+const ResizableImage = Image.extend({
+	addAttributes() {
+		return {
+			...this.parent?.(),
+			width: {
+				default: DEFAULT_IMAGE_WIDTH,
+				parseHTML: (element) =>
+					element.getAttribute("width") ?? DEFAULT_IMAGE_WIDTH,
+				renderHTML: (attributes) => ({
+					width: attributes.width,
+					style: `width: ${attributes.width}; max-width: 100%; height: auto;`,
+				}),
+			},
+		};
+	},
+});
 
 function getClipboardImageFile(event: ClipboardEvent) {
 	const file = Array.from(event.clipboardData?.files ?? []).find((candidate) =>
@@ -40,7 +58,7 @@ export function RichTextEditor({ initialContent, onChange }: Props) {
 				openOnClick: false,
 				protocols: ["http", "https", "mailto"],
 			}),
-			Image.configure({ allowBase64: false }),
+			ResizableImage.configure({ allowBase64: false }),
 			TableKit.configure({ table: { resizable: true } }),
 		],
 		content: initialContent,
@@ -79,7 +97,11 @@ export function RichTextEditor({ initialContent, onChange }: Props) {
 			editor
 				?.chain()
 				.focus()
-				.setImage({ src: result.url, alt: file.name })
+				.setImage({
+					src: result.url,
+					alt: file.name,
+				})
+				.updateAttributes("image", { width: DEFAULT_IMAGE_WIDTH })
 				.run();
 		} catch (error) {
 			window.alert(
@@ -89,6 +111,10 @@ export function RichTextEditor({ initialContent, onChange }: Props) {
 			setUploading(false);
 			if (fileInput.current) fileInput.current.value = "";
 		}
+	}
+
+	function setImageWidth(width: "50%" | "70%" | "100%") {
+		editor?.chain().focus().updateAttributes("image", { width }).run();
 	}
 
 	if (!editor)
@@ -184,6 +210,27 @@ export function RichTextEditor({ initialContent, onChange }: Props) {
 					onClick={() => fileInput.current?.click()}
 				>
 					{uploading ? "Uploading..." : "Image"}
+				</button>
+				<button
+					type="button"
+					className={buttonClass}
+					onClick={() => setImageWidth("50%")}
+				>
+					Image 50%
+				</button>
+				<button
+					type="button"
+					className={buttonClass}
+					onClick={() => setImageWidth("70%")}
+				>
+					Image 70%
+				</button>
+				<button
+					type="button"
+					className={buttonClass}
+					onClick={() => setImageWidth("100%")}
+				>
+					Image 100%
 				</button>
 				<button
 					type="button"

@@ -64,8 +64,10 @@ function renderNode(
 	if (node.type === "image") {
 		const src = safeHref(node.attrs?.src);
 		if (!src) return null;
+		const rawWidth = String(node.attrs?.width ?? "100%");
+		const imageWidth = /^(50|70|100)%$/.test(rawWidth) ? rawWidth : "100%";
 		return (
-			<figure key={key}>
+			<figure key={key} style={{ width: imageWidth }}>
 				<img
 					src={src}
 					alt={String(node.attrs?.alt ?? "Article image")}
