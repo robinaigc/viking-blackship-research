@@ -28,3 +28,12 @@ test("new and edit article pages pass existing categories to the form", () => {
 	assert.match(editArticlePage, /getAdminCategoryOptions/);
 	assert.match(editArticlePage, /categoryOptions=\{categoryOptions\}/);
 });
+
+test("article form keeps slug and author automatic instead of showing inputs", () => {
+	assert.doesNotMatch(articleForm, />\s*URL slug\s*</);
+	assert.doesNotMatch(articleForm, />\s*Author\s*</);
+	assert.match(articleForm, /type="hidden" name="slug"/);
+	assert.match(articleForm, /type="hidden" name="author"/);
+	assert.match(articleForm, /slugifyArticleTitle\(value\)/);
+	assert.match(articleForm, /Robin Seun/);
+});

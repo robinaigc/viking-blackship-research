@@ -30,10 +30,10 @@ export function ArticleForm({
 }: Props) {
 	const [title, setTitle] = useState(article?.title ?? "");
 	const [slug, setSlug] = useState(article?.slug ?? "");
-	const [slugEdited, setSlugEdited] = useState(Boolean(article));
 	const [content, setContent] = useState<ArticleDocument>(
 		article?.content ?? emptyDocument,
 	);
+	const author = article?.author ?? "Robin Seun";
 
 	return (
 		<form action={action} className="space-y-8">
@@ -42,6 +42,8 @@ export function ArticleForm({
 				<input type="hidden" name="previousSlug" value={article.slug} />
 			) : null}
 			<input type="hidden" name="content" value={JSON.stringify(content)} />
+			<input type="hidden" name="slug" value={slug} />
+			<input type="hidden" name="author" value={author} />
 
 			{saved ? (
 				<p className="rounded-lg border border-emerald-900 bg-emerald-950/40 p-4 text-sm text-emerald-300">
@@ -66,32 +68,8 @@ export function ArticleForm({
 						onChange={(event) => {
 							const value = event.target.value;
 							setTitle(value);
-							if (!slugEdited) setSlug(slugifyArticleTitle(value));
+							if (!article) setSlug(slugifyArticleTitle(value));
 						}}
-					/>
-				</label>
-				<label className="text-sm text-zinc-300">
-					URL slug
-					<input
-						className={fieldClass}
-						name="slug"
-						required
-						maxLength={120}
-						value={slug}
-						onChange={(event) => {
-							setSlugEdited(true);
-							setSlug(slugifyArticleTitle(event.target.value));
-						}}
-					/>
-				</label>
-				<label className="text-sm text-zinc-300">
-					Author
-					<input
-						className={fieldClass}
-						name="author"
-						required
-						maxLength={120}
-						defaultValue={article?.author ?? "Robin Seun"}
 					/>
 				</label>
 				<label className="text-sm text-zinc-300">
